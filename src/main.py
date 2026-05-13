@@ -1,10 +1,15 @@
-from scapy.all import arping
+from scapy.all import ARP, Ether, srp
 
-def arp_scan():
-    arping("11.30.0.0/21", iface="en0", verbose=True)
+target_subnet = "11.30.0.0/21"
 
-def main():
-    arp_scan()
+arp = ARP(pdst=target_subnet)
+ether = Ether(dst="ff:ff:ff:ff:ff:ff")
 
-if __name__ == "__main__":
-    main()
+packet = ether / arp
+
+res = srp(packet, timeout=2, verbose=1)[0]
+
+print("Discovered hosts:\n")
+
+for sent, received in res:
+    print(f"IP: {received.psrc}\tMAC: {received.hwsrc}")
