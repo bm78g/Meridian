@@ -84,11 +84,10 @@ def monitor_network(repeat=True):
 
 @app.route("/scan")
 def scan():
-    thread = threading.Thread(target=monitor_network, args=(False,))
+    thread = threading.Thread(target=monitor_network, args=(True,))
     thread.daemon = True
     thread.start()
     return jsonify({"message": "scan started"}), 202
-
 
 def main():
     banner = pyfiglet.figlet_format("Meridian")
