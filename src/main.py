@@ -1,7 +1,8 @@
 from scapy.all import *
 import os
 from dotenv import load_dotenv
-from vendor_lookup import lookup_vendor
+from vendor_lookup import lookup_vendors
+from reverse_dns import *
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
@@ -20,10 +21,11 @@ def main():
     for _, received in res:
         hosts.append(received)
 
-    host_data = lookup_vendor(hosts)
+    vendors = lookup_vendors(hosts)
+    dns = search_hosts(hosts)
         
-    for data in host_data:
-        print(data)
+    print(vendors)
+    print(dns)
 
 if __name__ == "__main__":
     main()
