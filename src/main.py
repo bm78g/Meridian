@@ -28,30 +28,35 @@ def main():
 
     print("Discovered hosts:\n")
 
+    # Discovered hosts
     hosts = []
     for _, received in res:
         hosts.append(received)
         print(f"IP: {received.psrc}\tMAC: {received.hwsrc}")
 
+    # Format MAC addrs
     mac_addrs = []
     for host in hosts:
         parsed_hwsrc = host.hwsrc.replace(":", "-")
         mac_addrs.append(parsed_hwsrc)
 
+    # Parse vendor lookup data into a dict
     with open(os.getenv("MAC_LOOKUP_DIR"), "r") as lookup_file:
         lookup_data = lookup_file.read()
         mac_dict = parse_lookup(lookup_data)
 
-    mac_vendors = []
-    for addr in mac_addrs:
+    # Compile host data
+    host_data = []
+    for host in hosts:
+        f_mac = host.hwsrc.replace(":", "-")
         try:
-            vendor = mac_dict[addr[0:8].upper()]
-            mac_vendors.append((addr, vendor))
+            vendor = mac_dict[f_mac.upper()[0:8]]
         except KeyError:
-            mac_vendors.append((addr, "Unknown"))
+            vendor = "Unknown"
+        host_data.append((host.psrc, host.hwsrc, vendor))
         
-    for mac_vendor in mac_vendors:
-        print(mac_vendor)
+    for data in host_data:
+        print(data)
 
 if __name__ == "__main__":
     main()
