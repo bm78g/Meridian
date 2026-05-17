@@ -1,13 +1,15 @@
 from scapy.all import ARP, Ether, srp
 import os
 import sys
+import pyfiglet
+
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
-from models import Host
 from util.host_db import store_hosts
-import pyfiglet
+
+from models import Host
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
