@@ -1,15 +1,17 @@
-from scapy.all import *
+from scapy.all import ARP, Ether, srp
 import os
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import *
-from util.port_scan import scan_hosts
+from util.port_scan import scan_hosts, scan_hosts_legacy
 from models import Host
+from datetime import datetime
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
 
 def main():
+    # Send ARP broadcast
     arp = ARP(pdst=target_subnet)
     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
 
@@ -25,6 +27,7 @@ def main():
     for _, received in res:
         nodes.append(received)
 
+    # Node information aggregation
     vendors = lookup_vendors(nodes)
     dns = search_hosts(nodes)
     scan_result = scan_hosts(nodes)
@@ -40,7 +43,7 @@ def main():
         hosts.append(host)
 
     for host in hosts:
-        print(vars(host))
+        print(host.vendor)
 
 if __name__ == "__main__":
     main()
