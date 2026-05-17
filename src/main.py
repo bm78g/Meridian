@@ -10,19 +10,6 @@ from datetime import datetime
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
 
-def get_scan_time(legacy=False, hosts=[]):
-    start_time = datetime.now()
-    if legacy:
-        scan_hosts_legacy(hosts)
-        print("Legacy scan ", end="")
-    else:
-        scan_hosts(hosts)
-        print("Concurrent scan ", end="")
-    end_time = datetime.now()
-    delta = end_time - start_time
-    print(f"elapsed {delta}")
-    return delta
-
 def main():
     # Send ARP broadcast
     arp = ARP(pdst=target_subnet)
@@ -30,39 +17,33 @@ def main():
 
     packet = ether / arp
 
-    for i in range(5):
-        res = srp(packet, timeout=2, verbose=1)[0]
+    res = srp(packet, timeout=2, verbose=1)[0]
 
-        print()
-        for _, received in res:
-            print(f"IP: {received.psrc}, MAC: {received.hwsrc}")
+    print()
+    for _, received in res:
+        print(f"IP: {received.psrc}, MAC: {received.hwsrc}")
 
-        nodes = []
-        for _, received in res:
-            nodes.append(received)
+    nodes = []
+    for _, received in res:
+        nodes.append(received)
 
-        # Node information aggregation
-        vendors = lookup_vendors(nodes)
-        dns = search_hosts(nodes)
-
-        legacy_time = get_scan_time(True, nodes)
-        conc_time = get_scan_time(False, nodes)
-        speed_perc = (legacy_time / conc_time - 1) * 100
-        print(f"Delta: {legacy_time - conc_time}")
-        print(f"Concurrent scan {speed_perc:.2f}% faster")
+    # Node information aggregation
+    vendors = lookup_vendors(nodes)
+    dns = search_hosts(nodes)
+    scan_result = scan_hosts(nodes)
         
-    # assert len(vendors) == len(dns) == len(scan_result)
+    assert len(vendors) == len(dns) == len(scan_result)
 
-    # hosts = []
-    # for i in range(len(nodes)):
-    #     host = Host(nodes[i].psrc, nodes[i].hwsrc)
-    #     host.vendor = vendors[i]
-    #     host.domain = dns[i]
-    #     host.port_scan = scan_result[i]
-    #     hosts.append(host)
+    hosts = []
+    for i in range(len(nodes)):
+        host = Host(nodes[i].psrc, nodes[i].hwsrc)
+        host.vendor = vendors[i]
+        host.domain = dns[i]
+        host.port_scan = scan_result[i]
+        hosts.append(host)
 
-    # for host in hosts:
-    #     print(vars(host))
+    for host in hosts:
+        print(host.vendor)
 
 if __name__ == "__main__":
     main()
