@@ -2,6 +2,7 @@ from scapy.all import ARP, Ether, srp
 import os
 import sys
 import pyfiglet
+from pathlib import Path
 
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
@@ -52,6 +53,14 @@ def monitor_network():
 
         db_file = store_hosts(hosts)
         get_diff(db_file)
+
+        files = [f for f in Path(os.getenv("SNAPSHOT_DIR")).iterdir() if f.is_file()]
+        max_count = os.getenv("MAX_SNAPSHOTS")
+        if len(files) > int(max_count):
+            files.sort()
+            for i in range(len(files)):
+                if len(files) - i > int(max_count):
+                    os.remove(files[i])
 
         # Free memory after each scan
         for host in hosts:
