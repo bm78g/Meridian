@@ -21,6 +21,7 @@ def get_scan_time(legacy=False, hosts=[]):
     end_time = datetime.now()
     delta = end_time - start_time
     print(f"elapsed {delta}")
+    return delta
 
 def main():
     # Send ARP broadcast
@@ -29,22 +30,26 @@ def main():
 
     packet = ether / arp
 
-    res = srp(packet, timeout=2, verbose=1)[0]
+    for i in range(5):
+        res = srp(packet, timeout=2, verbose=1)[0]
 
-    print()
-    for _, received in res:
-        print(f"IP: {received.psrc}, MAC: {received.hwsrc}")
+        print()
+        for _, received in res:
+            print(f"IP: {received.psrc}, MAC: {received.hwsrc}")
 
-    nodes = []
-    for _, received in res:
-        nodes.append(received)
+        nodes = []
+        for _, received in res:
+            nodes.append(received)
 
-    # Node information aggregation
-    vendors = lookup_vendors(nodes)
-    dns = search_hosts(nodes)
+        # Node information aggregation
+        vendors = lookup_vendors(nodes)
+        dns = search_hosts(nodes)
 
-    get_scan_time(True, nodes)
-    get_scan_time(False, nodes)
+        legacy_time = get_scan_time(True, nodes)
+        conc_time = get_scan_time(False, nodes)
+        speed_perc = (legacy_time / conc_time - 1) * 100
+        print(f"Delta: {legacy_time - conc_time}")
+        print(f"Concurrent scan {speed_perc:.2f}% faster")
         
     # assert len(vendors) == len(dns) == len(scan_result)
 
