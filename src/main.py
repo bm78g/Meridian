@@ -4,6 +4,7 @@ import sys
 import pyfiglet
 from flask import Flask, jsonify
 import threading
+import uuid
 
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
@@ -19,6 +20,8 @@ load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
 
 app = Flask(__name__)
+
+snapshot_id = uuid.uuid4()
 
 @app.route("/hosts")
 def get_hosts():
@@ -66,6 +69,9 @@ def monitor_network(repeat=True):
         db_file = store_hosts(hosts)
         get_diff(db_file)
 
+        global snapshot_id
+        snapshot_id = uuid.uuid4()
+
         # Remove old overflowing snapshots
         files = get_files(os.getenv("SNAPSHOT_DIR"))
         max_count = os.getenv("MAX_SNAPSHOTS")
@@ -83,11 +89,15 @@ def monitor_network(repeat=True):
             return
 
 @app.route("/scan")
-def scan():
+def trigger_scan():
     thread = threading.Thread(target=monitor_network, args=(True,))
     thread.daemon = True
     thread.start()
     return jsonify({"message": "scan started"}), 202
+
+@app.route("/scan/status")
+def get_status():
+    return str(snapshot_id)
 
 def main():
     banner = pyfiglet.figlet_format("Meridian")
