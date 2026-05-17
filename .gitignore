@@ -5,3 +5,4 @@ __pycache__
 .env
 .Ds_Store
 .venv
+network_topology.db

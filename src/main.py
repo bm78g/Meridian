@@ -5,6 +5,7 @@ from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
 from models import Host
+from util.host_db import store_hosts
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
@@ -43,8 +44,9 @@ def main():
         host.port_scan = scan_result[i]
         hosts.append(host)
 
-    for host in hosts:
-        print(host.vendor)
+    store_hosts(hosts)
+    # for host in hosts:
+    #     print(host.port_scan)
 
 if __name__ == "__main__":
     main()
