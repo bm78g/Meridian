@@ -1,4 +1,4 @@
-from scapy.all import *
+from scapy.all import ARP, Ether, srp
 import os
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
