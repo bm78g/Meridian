@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import *
 from util.port_scan import scan_hosts
-from host import Host
+from models import Host
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
@@ -41,6 +41,6 @@ def main():
 
     for host in hosts:
         print(vars(host))
-        
+
 if __name__ == "__main__":
     main()
