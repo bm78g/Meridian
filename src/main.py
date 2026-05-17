@@ -26,13 +26,12 @@ def main():
 
     res = srp(packet, timeout=2, verbose=1)[0]
 
-    print("Discovered hosts:\n")
+    print()
 
     # Discovered hosts
     hosts = []
     for _, received in res:
         hosts.append(received)
-        print(f"IP: {received.psrc}\tMAC: {received.hwsrc}")
 
     # Format MAC addrs
     mac_addrs = []
