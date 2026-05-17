@@ -1,6 +1,6 @@
 import socket
 
-def reverse_dns(ip):
+def _reverse_dns(ip):
     try:
         hostname, _, _ = socket.gethostbyaddr(ip)
         return hostname
@@ -10,5 +10,5 @@ def reverse_dns(ip):
 def search_hosts(hosts):
     dns = []
     for host in hosts:
-        dns.append(reverse_dns(host.psrc))
+        dns.append(_reverse_dns(host.psrc))
     return dns
