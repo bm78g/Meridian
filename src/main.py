@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import *
 from util.port_scan import scan_hosts
+from host import Host
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
@@ -20,15 +21,26 @@ def main():
     for _, received in res:
         print(f"IP: {received.psrc}, MAC: {received.hwsrc}")
 
-    hosts = []
+    nodes = []
     for _, received in res:
-        hosts.append(received)
+        nodes.append(received)
 
-    vendors = lookup_vendors(hosts)
-    dns = search_hosts(hosts)
-    scan_result = scan_hosts(hosts)
+    vendors = lookup_vendors(nodes)
+    dns = search_hosts(nodes)
+    scan_result = scan_hosts(nodes)
         
     assert len(vendors) == len(dns) == len(scan_result)
 
+    hosts = []
+    for i in range(len(nodes)):
+        host = Host(nodes[i].psrc, nodes[i].hwsrc)
+        host.vendor = vendors[i]
+        host.domain = dns[i]
+        host.port_scan = scan_result[i]
+        hosts.append(host)
+
+    for host in hosts:
+        print(vars(host))
+        
 if __name__ == "__main__":
     main()
