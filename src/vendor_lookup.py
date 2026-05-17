@@ -17,19 +17,19 @@ def parse_lookup(lookup_data):
 
     return parsed
 
-def lookup_vendor(hosts):
+# Returns a list of vendors corresponding to MAC addr
+def lookup_vendors(hosts):
     with open(os.getenv("MAC_LOOKUP_DIR"), "r") as lookup_file:
         lookup_data = lookup_file.read()
         mac_dict = parse_lookup(lookup_data)
 
-    # Compile host data
-    host_data = []
+    vendors = []
     for host in hosts:
         f_mac = host.hwsrc.replace(":", "-")
         try:
             vendor = mac_dict[f_mac.upper()[0:8]]
+            vendors.append(vendor)
         except KeyError:
-            vendor = "Unknown"
-        host_data.append((host.psrc, host.hwsrc, vendor))
+            vendors.append("Unknown")
 
-    return host_data
+    return vendors
