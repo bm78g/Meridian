@@ -54,6 +54,7 @@ def monitor_network():
         db_file = store_hosts(hosts)
         get_diff(db_file)
 
+        # Remove old overflowing snapshots
         files = [f for f in Path(os.getenv("SNAPSHOT_DIR")).iterdir() if f.is_file()]
         max_count = os.getenv("MAX_SNAPSHOTS")
         if len(files) > int(max_count):

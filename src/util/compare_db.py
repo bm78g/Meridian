@@ -17,9 +17,6 @@ def _compare_db(file1, file2):
     cursor.execute("SELECT * FROM old.hosts EXCEPT SELECT * FROM main.hosts")
     host_removed = cursor.fetchall()
 
-    # cursor.execute("SELECT * FROM main.ports EXCEPT SELECT * FROM old.ports")
-    # port_diff = cursor.fetchall()
-
     conn.close()
     return (host_added, host_removed)
 
