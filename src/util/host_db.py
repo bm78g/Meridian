@@ -20,7 +20,7 @@ def _store_host(host, conn):
 def store_hosts(hosts):
     now = datetime.now()
     timestamp = f"{now.year}-{now.month:02}-{now.day:02}_{now.hour:02}-{now.minute:02}-{now.second:02}"
-    conn = sqlite3.connect(f"data/{timestamp}.db", timeout=5)
+    conn = sqlite3.connect(f"data/network_snapshot/{timestamp}.db", timeout=5)
 
     for host in hosts:
         _store_host(host, conn)
@@ -28,3 +28,4 @@ def store_hosts(hosts):
     conn.commit()
     conn.close()
     print("Data successfully stored")
+    return f"{timestamp}.db"
