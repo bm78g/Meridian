@@ -45,6 +45,8 @@ def main():
         hosts.append(host)
 
     store_hosts(hosts)
+    # for host in hosts:
+    #     print(host.port_scan)
 
 if __name__ == "__main__":
     main()
