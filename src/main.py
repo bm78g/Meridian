@@ -33,12 +33,6 @@ def main():
     for _, received in res:
         hosts.append(received)
 
-    # Format MAC addrs
-    mac_addrs = []
-    for host in hosts:
-        parsed_hwsrc = host.hwsrc.replace(":", "-")
-        mac_addrs.append(parsed_hwsrc)
-
     # Parse vendor lookup data into a dict
     with open(os.getenv("MAC_LOOKUP_DIR"), "r") as lookup_file:
         lookup_data = lookup_file.read()
