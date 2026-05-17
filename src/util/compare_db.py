@@ -1,5 +1,6 @@
 import sqlite3
 from pathlib import Path
+import pprint
 
 def _compare_db(file1, file2):
     conn = sqlite3.connect(file1)
@@ -12,14 +13,11 @@ def _compare_db(file1, file2):
     cursor.execute("SELECT * FROM old.hosts EXCEPT SELECT * FROM main.hosts")
     host_removed = cursor.fetchall()
 
-    cursor.execute("SELECT * FROM main.ports EXCEPT SELECT * FROM old.ports")
-    port_diff = cursor.fetchall()
-
-    print(host_added)
-    print(host_removed)
-    print(port_diff)
+    # cursor.execute("SELECT * FROM main.ports EXCEPT SELECT * FROM old.ports")
+    # port_diff = cursor.fetchall()
 
     conn.close()
+    return (host_added, host_removed)
 
 def _fetch_pair(current):
     files = [f for f in Path('./data/network_snapshot').iterdir() if f.is_file()]
@@ -35,6 +33,14 @@ def _fetch_pair(current):
 def get_diff(filename):
     pair = _fetch_pair(filename)
     if pair[0] != "":
-        _compare_db(pair[0], pair[1])
+        diff = _compare_db(pair[0], pair[1])
+
+        print("Host added: ")
+        pprint.pprint(diff[0], width=20)
+
+        print("Host removed: ")
+        pprint.pprint(diff[1], width=20)
+
+        print("")
     else:
         print("Comparison failed")
