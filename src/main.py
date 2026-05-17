@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
-from util.host_db import store_hosts, retrieve_hosts
+from util.host_db import store_hosts, retrieve_hosts, retrieve_ports
 from util.compare_db import get_diff
 
 from models import Host
@@ -19,9 +19,13 @@ target_subnet = os.getenv("TARGET_SUBNET")
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/hosts")
 def get_hosts():
     return jsonify(retrieve_hosts())
+
+@app.route("/ports")
+def get_ports():
+    return jsonify(retrieve_ports())
 
 def monitor_network():
     # Send ARP broadcast
