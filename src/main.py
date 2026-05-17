@@ -10,6 +10,7 @@ load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
 
 def main():
+    # Send ARP broadcast
     arp = ARP(pdst=target_subnet)
     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
 
@@ -25,6 +26,7 @@ def main():
     for _, received in res:
         nodes.append(received)
 
+    # Node information aggregation
     vendors = lookup_vendors(nodes)
     dns = search_hosts(nodes)
     scan_result = scan_hosts(nodes)
