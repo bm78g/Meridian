@@ -3,6 +3,7 @@ import os
 import sys
 import pyfiglet
 from flask import Flask, jsonify
+import threading
 
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
@@ -27,7 +28,7 @@ def get_hosts():
 def get_ports():
     return jsonify(retrieve_ports())
 
-def monitor_network():
+def monitor_network(repeat=True):
     # Send ARP broadcast
     arp = ARP(pdst=target_subnet)
     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
@@ -77,6 +78,17 @@ def monitor_network():
         # Free memory after each scan
         for host in hosts:
             del host
+        
+        if not repeat:
+            return
+
+@app.route("/scan")
+def scan():
+    thread = threading.Thread(target=monitor_network, args=(False,))
+    thread.daemon = True
+    thread.start()
+    return jsonify({"message": "scan started"}), 202
+
 
 def main():
     banner = pyfiglet.figlet_format("Meridian")
@@ -86,7 +98,7 @@ def main():
         choice = input("Select an operation:\n1) Monitor network\n2) Run REST endpoint\n3) Exit program\n")
         match choice:
             case "1":
-                monitor_network()
+                monitor_network(repeat=True)
                 break
             case "2":
                 app.run(port=os.getenv("PORT"))
