@@ -12,21 +12,7 @@ import pyfiglet
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
 
-def main():
-    banner = pyfiglet.figlet_format("Meridian Engine")
-    print(banner)
-
-    while (True):
-        choice = input("Select an operation:\n1) Monitor network\n2) Exit program\n")
-        match choice:
-            case "1":
-                break
-            case "2":
-                print("Exiting program...")
-                sys.exit(0)
-            case _:
-                print("Please enter a valid choice.")
-                
+def monitor_network():
     # Send ARP broadcast
     arp = ARP(pdst=target_subnet)
     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
@@ -61,8 +47,22 @@ def main():
         hosts.append(host)
 
     store_hosts(hosts)
-    # for host in hosts:
-    #     print(host.port_scan)
+
+def main():
+    banner = pyfiglet.figlet_format("Meridian Engine")
+    print(banner)
+
+    while (True):
+        choice = input("Select an operation:\n1) Monitor network\n2) Exit program\n")
+        match choice:
+            case "1":
+                monitor_network()
+                break
+            case "2":
+                print("Exiting program...")
+                sys.exit(0)
+            case _:
+                print("Please enter a valid choice")
 
 if __name__ == "__main__":
     main()
