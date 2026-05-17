@@ -2,7 +2,6 @@ from scapy.all import ARP, Ether, srp
 import os
 import sys
 import pyfiglet
-from pathlib import Path
 from flask import Flask, jsonify
 
 from dotenv import load_dotenv
@@ -11,6 +10,7 @@ from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
 from util.host_db import store_hosts, retrieve_hosts, retrieve_ports
 from util.compare_db import get_diff
+from util.fileio import get_files
 
 from models import Host
 
@@ -66,7 +66,7 @@ def monitor_network():
         get_diff(db_file)
 
         # Remove old overflowing snapshots
-        files = [f for f in Path(os.getenv("SNAPSHOT_DIR")).iterdir() if f.is_file()]
+        files = get_files(os.getenv("SNAPSHOT_DIR"))
         max_count = os.getenv("MAX_SNAPSHOTS")
         if len(files) > int(max_count):
             files.sort()
@@ -89,7 +89,7 @@ def main():
                 monitor_network()
                 break
             case "2":
-                app.run()
+                app.run(port=os.getenv("PORT"))
                 break
             case "3":
                 print("Exiting program...")

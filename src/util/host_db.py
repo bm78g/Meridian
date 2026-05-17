@@ -2,7 +2,6 @@ import sqlite3
 from datetime import datetime
 import os
 from dotenv import load_dotenv
-from pathlib import Path
 from util.fileio import get_files
 
 load_dotenv()
@@ -37,7 +36,7 @@ def store_hosts(hosts):
     return f"{timestamp}.db"
 
 def retrieve_hosts():
-    files = [f for f in Path(os.getenv("SNAPSHOT_DIR")).iterdir() if f.is_file()]
+    files = get_files(os.getenv("SNAPSHOT_DIR"))
     files.sort()
     conn = sqlite3.connect(files[-1], timeout=5)
     cursor = conn.cursor()
