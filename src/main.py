@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from vendor_lookup import lookup_vendors
 from reverse_dns import *
+from port_scan import scan_hosts
+import pprint
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
@@ -16,6 +18,8 @@ def main():
     res = srp(packet, timeout=2, verbose=1)[0]
 
     print()
+    for _, received in res:
+        print(f"IP: {received.psrc}, MAC: {received.hwsrc}")
 
     hosts = []
     for _, received in res:
@@ -23,9 +27,9 @@ def main():
 
     vendors = lookup_vendors(hosts)
     dns = search_hosts(hosts)
+    scan_result = scan_hosts(hosts)
         
-    print(vendors)
-    print(dns)
+    assert len(vendors) == len(dns) == len(scan_result)
 
 if __name__ == "__main__":
     main()
