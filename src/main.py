@@ -3,6 +3,7 @@ import os
 import sys
 import pyfiglet
 from flask import Flask, jsonify
+from flask_cors import CORS
 import threading
 import uuid
 
@@ -20,6 +21,7 @@ load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
 
 app = Flask(__name__)
+CORS(app)
 
 snapshot_id = uuid.uuid4()
 
