@@ -1,10 +1,9 @@
 from scapy.all import *
 import os
 from dotenv import load_dotenv
-from vendor_lookup import lookup_vendors
-from reverse_dns import *
-from port_scan import scan_hosts
-import pprint
+from util.vendor_lookup import lookup_vendors
+from util.reverse_dns import *
+from util.port_scan import scan_hosts
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
