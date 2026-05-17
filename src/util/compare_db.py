@@ -1,7 +1,7 @@
 import sqlite3
 from pathlib import Path
 
-def compare_db(file1, file2):
+def _compare_db(file1, file2):
     conn = sqlite3.connect(file1)
     cursor = conn.cursor()
 
@@ -21,16 +21,20 @@ def compare_db(file1, file2):
 
     conn.close()
 
-def get_prev(current):
+def _fetch_pair(current):
     files = [f for f in Path('./data/network_snapshot').iterdir() if f.is_file()]
     files.sort()
     for i in range(len(files)):
         if files[i].name == current:
             if i == 0:
-                return ""
+                return ("", "")
             else:
-                return files[i - 1]
-    return ""
+                return (str(files[i]), str(files[i - 1]))
+    return ("", "")
 
-# compare_db("data/2026-5-17_15-30-33.db", "data/2026-5-17_15-14-6.db")
-print(get_prev("2026-05-17_15-38-42.db"))
+def get_diff(filename):
+    pair = _fetch_pair(filename)
+    if pair[0] != "":
+        _compare_db(pair[0], pair[1])
+    else:
+        print("Comparison failed")
