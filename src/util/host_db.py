@@ -1,7 +1,7 @@
 import sqlite3
+from datetime import datetime
 
-def store_host(host):
-    conn = sqlite3.connect("data/network_topology.db", timeout=5)
+def _store_host(host, conn):
     cursor = conn.cursor()
 
     cursor.execute("CREATE TABLE IF NOT EXISTS hosts (mac CHAR(17) PRIMARY KEY, ipv4 VARCHAR(15)," \
@@ -17,10 +17,14 @@ def store_host(host):
         cursor.execute("INSERT INTO ports (port, mac, state, name, product, version) VALUES (?, ?, ?, ?, ?, ?)",
                        (port["port"], host.mac, port["state"], port["name"], port["product"], port["version"]))
 
+def store_hosts(hosts):
+    now = datetime.now()
+    timestamp = f"{now.year}-{now.month}-{now.day}_{now.hour}-{now.minute}-{now.second}"
+    conn = sqlite3.connect(f"data/{timestamp}.db", timeout=5)
+
+    for host in hosts:
+        _store_host(host, conn)
+
     conn.commit()
     conn.close()
-
-def store_hosts(hosts):
-    for host in hosts:
-        store_host(host)
     print("Data successfully stored")
