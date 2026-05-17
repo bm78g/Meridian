@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Returns a dictionary of first 6 digits of MAC to vendor
-def parse_lookup(lookup_data):
+def _parse_lookup(lookup_data):
     pattern = r"[a-zA-Z0-9]{2}-[a-zA-Z0-9]{2}-[a-zA-Z0-9]{2}"
     split_data = lookup_data.replace("\n", "\t").split("\t")
     parsed = {}
@@ -21,7 +21,7 @@ def parse_lookup(lookup_data):
 def lookup_vendors(hosts):
     with open(os.getenv("MAC_LOOKUP_DIR"), "r") as lookup_file:
         lookup_data = lookup_file.read()
-        mac_dict = parse_lookup(lookup_data)
+        mac_dict = _parse_lookup(lookup_data)
 
     vendors = []
     for host in hosts:

@@ -1,13 +1,17 @@
 from scapy.all import ARP, Ether, srp
 import os
 import sys
+import pyfiglet
+from pathlib import Path
+
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
-from models import Host
 from util.host_db import store_hosts
-import pyfiglet
+from util.compare_db import get_diff
+
+from models import Host
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
@@ -47,7 +51,16 @@ def monitor_network():
             host.port_scan = scan_result[i]
             hosts.append(host)
 
-        store_hosts(hosts)
+        db_file = store_hosts(hosts)
+        get_diff(db_file)
+
+        files = [f for f in Path(os.getenv("SNAPSHOT_DIR")).iterdir() if f.is_file()]
+        max_count = os.getenv("MAX_SNAPSHOTS")
+        if len(files) > int(max_count):
+            files.sort()
+            for i in range(len(files)):
+                if len(files) - i > int(max_count):
+                    os.remove(files[i])
 
         # Free memory after each scan
         for host in hosts:
