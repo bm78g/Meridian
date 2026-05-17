@@ -3,13 +3,13 @@ import os
 import sys
 import pyfiglet
 from pathlib import Path
-from flask import Flask
+from flask import Flask, jsonify
 
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
-from util.host_db import store_hosts
+from util.host_db import store_hosts, retrieve_hosts
 from util.compare_db import get_diff
 
 from models import Host
@@ -20,8 +20,8 @@ target_subnet = os.getenv("TARGET_SUBNET")
 app = Flask(__name__)
 
 @app.route("/")
-def hello_world():
-    return "Hello, world!"
+def get_hosts():
+    return jsonify(retrieve_hosts())
 
 def monitor_network():
     # Send ARP broadcast
