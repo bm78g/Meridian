@@ -23,3 +23,4 @@ def store_host(host):
 def store_hosts(hosts):
     for host in hosts:
         store_host(host)
+    print("Data successfully stored")
