@@ -8,6 +8,7 @@ from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
 from util.host_db import store_hosts
+from util.compare_db import get_diff
 
 from models import Host
 
@@ -49,7 +50,8 @@ def monitor_network():
             host.port_scan = scan_result[i]
             hosts.append(host)
 
-        store_hosts(hosts)
+        db_file = store_hosts(hosts)
+        get_diff(db_file)
 
         # Free memory after each scan
         for host in hosts:
