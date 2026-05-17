@@ -3,6 +3,7 @@ import os
 import sys
 import pyfiglet
 from pathlib import Path
+from flask import Flask
 
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
@@ -15,6 +16,12 @@ from models import Host
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello_world():
+    return "Hello, world!"
 
 def monitor_network():
     # Send ARP broadcast
@@ -72,12 +79,15 @@ def main():
     print(banner)
 
     while True:
-        choice = input("Select an operation:\n1) Monitor network\n2) Exit program\n")
+        choice = input("Select an operation:\n1) Monitor network\n2) Run REST endpoint\n3) Exit program\n")
         match choice:
             case "1":
                 monitor_network()
                 break
             case "2":
+                app.run()
+                break
+            case "3":
                 print("Exiting program...")
                 sys.exit(0)
             case _:
