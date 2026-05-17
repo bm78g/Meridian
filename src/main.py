@@ -2,19 +2,30 @@ from scapy.all import ARP, Ether, srp
 import os
 import sys
 import pyfiglet
-from pathlib import Path
+from flask import Flask, jsonify
 
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
-from util.host_db import store_hosts
+from util.host_db import store_hosts, retrieve_hosts, retrieve_ports
 from util.compare_db import get_diff
+from util.fileio import get_files
 
 from models import Host
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
+
+app = Flask(__name__)
+
+@app.route("/hosts")
+def get_hosts():
+    return jsonify(retrieve_hosts())
+
+@app.route("/ports")
+def get_ports():
+    return jsonify(retrieve_ports())
 
 def monitor_network():
     # Send ARP broadcast
@@ -55,7 +66,7 @@ def monitor_network():
         get_diff(db_file)
 
         # Remove old overflowing snapshots
-        files = [f for f in Path(os.getenv("SNAPSHOT_DIR")).iterdir() if f.is_file()]
+        files = get_files(os.getenv("SNAPSHOT_DIR"))
         max_count = os.getenv("MAX_SNAPSHOTS")
         if len(files) > int(max_count):
             files.sort()
@@ -72,12 +83,15 @@ def main():
     print(banner)
 
     while True:
-        choice = input("Select an operation:\n1) Monitor network\n2) Exit program\n")
+        choice = input("Select an operation:\n1) Monitor network\n2) Run REST endpoint\n3) Exit program\n")
         match choice:
             case "1":
                 monitor_network()
                 break
             case "2":
+                app.run(port=os.getenv("PORT"))
+                break
+            case "3":
                 print("Exiting program...")
                 sys.exit(0)
             case _:

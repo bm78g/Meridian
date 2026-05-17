@@ -1,8 +1,8 @@
 import sqlite3
-from pathlib import Path
 import pprint
 import os
 from dotenv import load_dotenv
+from util.fileio import get_files
 
 load_dotenv()
 
@@ -21,7 +21,7 @@ def _compare_db(file1, file2):
     return (host_added, host_removed)
 
 def _fetch_pair(current):
-    files = [f for f in Path(os.getenv("SNAPSHOT_DIR")).iterdir() if f.is_file()]
+    files = get_files(os.getenv("SNAPSHOT_DIR"))
     files.sort()
     for i in range(len(files)):
         if files[i].name == current:

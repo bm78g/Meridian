@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from util.fileio import get_files
 
 load_dotenv()
 
@@ -33,3 +34,31 @@ def store_hosts(hosts):
     conn.close()
     print("Data successfully stored")
     return f"{timestamp}.db"
+
+def retrieve_hosts():
+    files = get_files(os.getenv("SNAPSHOT_DIR"))
+    files.sort()
+    conn = sqlite3.connect(files[-1], timeout=5)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM hosts")
+    hosts = cursor.fetchall()
+
+    conn.commit()
+    conn.close()
+
+    return hosts
+
+def retrieve_ports():
+    files = get_files(os.getenv("SNAPSHOT_DIR"))
+    files.sort()
+    conn = sqlite3.connect(files[-1], timeout=5)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM ports")
+    ports = cursor.fetchall()
+
+    conn.commit()
+    conn.close()
+
+    return ports
