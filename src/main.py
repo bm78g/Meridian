@@ -1,16 +1,32 @@
 from scapy.all import ARP, Ether, srp
 import os
+import sys
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
 from util.reverse_dns import search_hosts
 from util.port_scan import scan_hosts
 from models import Host
 from util.host_db import store_hosts
+import pyfiglet
 
 load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
 
 def main():
+    banner = pyfiglet.figlet_format("Meridian Engine")
+    print(banner)
+
+    while (True):
+        choice = input("Select an operation:\n1) Monitor network\n2) Exit program\n")
+        match choice:
+            case "1":
+                break
+            case "2":
+                print("Exiting program...")
+                sys.exit(0)
+            case _:
+                print("Please enter a valid choice.")
+                
     # Send ARP broadcast
     arp = ARP(pdst=target_subnet)
     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
