@@ -43,5 +43,7 @@ def get_diff(filename):
         pprint.pprint(diff[1], width=20)
 
         print("")
+        
+        return diff
     else:
         print("Comparison failed")

@@ -33,6 +33,10 @@ def get_hosts():
 def get_ports():
     return jsonify(retrieve_ports())
 
+@app.route("/events")
+def get_events():
+    return jsonify(diff)
+
 def monitor_network(repeat=True):
     # Send ARP broadcast
     arp = ARP(pdst=target_subnet)
@@ -69,7 +73,9 @@ def monitor_network(repeat=True):
             hosts.append(host)
 
         db_file = store_hosts(hosts)
-        get_diff(db_file)
+
+        global diff
+        diff = get_diff(db_file)
 
         global snapshot_id
         snapshot_id = uuid.uuid4()
