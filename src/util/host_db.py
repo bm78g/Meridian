@@ -38,7 +38,7 @@ def store_hosts(hosts):
 def retrieve_hosts():
     files = get_files(os.getenv("SNAPSHOT_DIR"))
     files.sort()
-    conn = sqlite3.connect(files[-1], timeout=5)
+    conn = sqlite3.connect(str(files[-1]), timeout=5)
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM hosts")
@@ -52,7 +52,7 @@ def retrieve_hosts():
 def retrieve_ports():
     files = get_files(os.getenv("SNAPSHOT_DIR"))
     files.sort()
-    conn = sqlite3.connect(files[-1], timeout=5)
+    conn = sqlite3.connect(str(files[-1]), timeout=5)
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM ports")

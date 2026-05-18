@@ -3,6 +3,9 @@ import os
 import sys
 import pyfiglet
 from flask import Flask, jsonify
+from flask_cors import CORS
+import threading
+import uuid
 
 from dotenv import load_dotenv
 from util.vendor_lookup import lookup_vendors
@@ -18,6 +21,9 @@ load_dotenv()
 target_subnet = os.getenv("TARGET_SUBNET")
 
 app = Flask(__name__)
+CORS(app)
+
+snapshot_id = uuid.uuid4()
 
 @app.route("/hosts")
 def get_hosts():
@@ -27,7 +33,7 @@ def get_hosts():
 def get_ports():
     return jsonify(retrieve_ports())
 
-def monitor_network():
+def monitor_network(repeat=True):
     # Send ARP broadcast
     arp = ARP(pdst=target_subnet)
     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
@@ -65,6 +71,9 @@ def monitor_network():
         db_file = store_hosts(hosts)
         get_diff(db_file)
 
+        global snapshot_id
+        snapshot_id = uuid.uuid4()
+
         # Remove old overflowing snapshots
         files = get_files(os.getenv("SNAPSHOT_DIR"))
         max_count = os.getenv("MAX_SNAPSHOTS")
@@ -77,6 +86,20 @@ def monitor_network():
         # Free memory after each scan
         for host in hosts:
             del host
+        
+        if not repeat:
+            return
+
+@app.route("/scan")
+def trigger_scan():
+    thread = threading.Thread(target=monitor_network, args=(True,))
+    thread.daemon = True
+    thread.start()
+    return jsonify({"message": "scan started"}), 202
+
+@app.route("/scan/status")
+def get_status():
+    return str(snapshot_id)
 
 def main():
     banner = pyfiglet.figlet_format("Meridian")
@@ -86,7 +109,7 @@ def main():
         choice = input("Select an operation:\n1) Monitor network\n2) Run REST endpoint\n3) Exit program\n")
         match choice:
             case "1":
-                monitor_network()
+                monitor_network(repeat=True)
                 break
             case "2":
                 app.run(port=os.getenv("PORT"))
