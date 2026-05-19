@@ -24,6 +24,7 @@ app = Flask(__name__)
 CORS(app)
 
 snapshot_id = uuid.uuid4()
+diff = {}
 
 @app.route("/hosts")
 def get_hosts():
